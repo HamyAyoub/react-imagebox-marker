@@ -17,9 +17,9 @@ const fakeData = [
 ];
 
 export default function App() {
-  const [point, setPoint] = useState(null);
+  const [mark, setMark] = useState(null);
   const [list, setList] = useState([]);
-  const [mapperState, setMapperState] = useState("new");
+  const [markStatus, setMarkStatus] = useState("new");
 
   useEffect(
     () => {
@@ -38,78 +38,81 @@ export default function App() {
     ]
   ); // better to listen to your Server Data
 
-  const getImagePoint = (pointObj, onlyGet = false) => {
-    setPoint(pointObj);
-    if (!onlyGet) setMapperState("edit");
+  const getImageMark = (markObj, onlyGet = false) => {
+    setMark(markObj);
+    if (!onlyGet) setMarkStatus("edit");
   };
 
-  const savePoint = (pointObj) => {
+  const saveMark = (markObj) => {
     let listData = [...list];
-    const index = list.findIndex((d) => d.id === pointObj.id);
+    const index = list.findIndex((d) => d.id === markObj.id);
     if (index < 0) {
-      // send Post to Server EndPoint
+      // send Post to Server EndMark
       // ...
-      listData = [...listData, pointObj];
+      listData = [...listData, markObj];
     } else {
-      // send Put to Server EndPoint
+      // send Put to Server EndMark
       // ...
-      listData[index] = pointObj;
+      listData[index] = markObj;
     }
     setList(listData);
-    setMapperState("new");
-    setPoint(null);
+    setMarkStatus("new");
+    setMark(null);
   };
 
-  const removeCb = (pointObj) => {
-    const obj = list.find((data) => pointObj.id === data.id);
+  const removeCb = (markObj) => {
+    if (markStatus === "locked") return;
+    const obj = list.find((data) => markObj.id === data.id);
     if (obj) {
-      // send Delete to Server EndPoint
+      // send Delete to Server EndMark
       // ...
       const filteredData = list.filter((d) => d.id !== obj.id);
       setList(filteredData);
     }
-    setPoint(null);
+    setMark(null);
   };
 
-  const cancelunSavedPoint = (pointObj) => {
-    setPoint(null);
-    const obj = list.find((data) => pointObj.id === data.id);
+  const cancelunSavedMark = (markObj) => {
+    setMark(null);
+    const obj = list.find((data) => markObj.id === data.id);
     if (obj) return;
     setList([...list]);
-    setMapperState("new");
+    setMarkStatus("new");
   };
 
-  const toggleLockImage = (pointObj) => {
-    if (mapperState === "locked") setMapperState("new");
+  const toggleLockImage = (markObj) => {
+    if (markStatus === "locked") setMarkStatus("new");
     else {
-      if (!pointObj || list.find((data) => pointObj.id === data.id)) {
-        setMapperState("locked");
+      if (!markObj || list.find((data) => markObj.id === data.id)) {
+        setMarkStatus("locked");
       }
     }
   };
 
   return (
     <>
-      <button onClick={() => toggleLockImage(point)}>
-        {mapperState === "locked" ? "Unlock" : "lock"}
+      <button onClick={() => toggleLockImage(mark)}>
+        {markStatus === "locked" ? "Unlock" : "lock"}
       </button>
       &nbsp;
-      {point && (
+      {mark && (
         <>
-          <button onClick={() => savePoint(point)}>Save</button>
+          <button onClick={() => saveMark(mark)}>Save</button>
           &nbsp;
-          <button onClick={() => cancelunSavedPoint(point)}>Cancel</button>
+          <button onClick={() => cancelunSavedMark(mark)}>Cancel</button>
           &nbsp;
         </>
       )}
-      {point && list.find((d) => d.id === point.id) && (
-        <button onClick={() => removeCb(point)}>rm {point.id}</button>
-      )}
+      {markStatus !== "locked" &&
+        mark &&
+        list.find((d) => d.id === mark.id) && (
+          <button onClick={() => removeCb(mark)}>rm {mark.id}</button>
+        )}
       <hr />
       <ImageMapper
-        status={mapperState}
+        status={markStatus}
         dataSource={list}
-        getPoint={getImagePoint}
+        getMark={getImageMark}
         scrollable
         wrapperBorder="thick solid purple"
         lasbelStyles={{
@@ -122,7 +125,7 @@ export default function App() {
           backgroundColor: "#955",
           color: "#fff"
         }}
-        // positionCalculation={12.5} // width/2
+        // bufferPoisition={12.5} // width/2
         imageSource="https://images.amcnetworks.com/amc.com/wp-content/uploads/2015/04/cast_bb_700x1000_walter-white-lg.jpg"
         // imageSource="https://via.placeholder.com/600/92c952"
       />

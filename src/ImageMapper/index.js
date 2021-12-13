@@ -2,21 +2,21 @@ import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 const ImageMapper = ({
-  positionCalculation = 5,
+  bufferPoisition = 5,
   scrollable = true,
   wrapperBorder = "none",
   lasbelStyles = {},
   imageSource,
   dataSource,
-  getPoint,
+  getMark,
   status
 }) => {
-  const [pointsList, setpointsList] = useState([]);
+  const [marksList, setMarksList] = useState([]);
   const [imgCoordinates, setImgCoordinates] = useState(null);
   const imgElem = useRef(null);
 
   useEffect(() => {
-    setpointsList(dataSource);
+    setMarksList(dataSource);
   }, [dataSource]);
 
   const loadImg = () => {
@@ -28,33 +28,33 @@ const ImageMapper = ({
     }
   };
 
-  const addMapper = (e) => {
+  const addMark = (e) => {
     if (status === "locked") return;
     const offset = imgElem.current.getBoundingClientRect();
     const x = e.pageX - offset.left - window.pageXOffset;
     const y = e.pageY - offset.top - window.pageYOffset;
     // console.log(x, y);
-    const updatedList = [...pointsList];
+    const updatedList = [...marksList];
     if (status === "edit") {
       updatedList.pop();
     }
     const nextId =
       (updatedList.length === 0 ? 0 : updatedList[updatedList.length - 1].id) +
       1;
-    const newPoint = {
+    const newMark = {
       id: nextId,
       label: nextId,
-      x: x - positionCalculation,
-      y: y - positionCalculation
+      x: x - bufferPoisition,
+      y: y - bufferPoisition
     };
-    updatedList.push(newPoint);
-    setpointsList(updatedList);
-    getPoint(newPoint);
+    updatedList.push(newMark);
+    setMarksList(updatedList);
+    getMark(newMark);
   };
 
-  const givePoint = (data) => {
-    const isEquals = pointsList.length === dataSource.length;
-    if (isEquals) getPoint(data, true);
+  const GetStableMark = (data) => {
+    const isEquals = marksList.length === dataSource.length;
+    if (isEquals) getMark(data, true);
   };
 
   return (
@@ -79,12 +79,12 @@ const ImageMapper = ({
           className="img-main"
           src={imageSource}
           alt="#"
-          onMouseDown={(e) => addMapper(e)}
+          onMouseDown={(e) => addMark(e)}
           ref={imgElem}
           onLoad={loadImg}
           style={{ userSelect: "none" }}
         />
-        {pointsList.map((data) => (
+        {marksList.map((data) => (
           <div
             key={data.id}
             style={{
@@ -99,7 +99,7 @@ const ImageMapper = ({
               left: data.x,
               top: data.y
             }}
-            onClick={() => givePoint(data)}
+            onClick={() => GetStableMark(data)}
           >
             {data.label}
           </div>
@@ -109,19 +109,17 @@ const ImageMapper = ({
   );
 };
 
-function Point(id, label, styles) {
-  this.id = id; // number
-  this.label = label; // string
-  this.styles = styles; // css object
-}
-
 ImageMapper.propTypes = {
   scrollable: PropTypes.bool.isRequired,
   imageSource: PropTypes.string.isRequired,
-  dataSource: PropTypes.arrayOf(Point).isRequired,
-  status: PropTypes.string.isRequired,
-  getPoint: PropTypes.func.isRequired,
-  pointMinusPoisition: PropTypes.number,
+  dataSource: PropTypes.arrayOf(function (id, label, styles) {
+    this.id = id; // number
+    this.label = label; // string
+    this.styles = styles; // css object
+  }).isRequired,
+  status: PropTypes.oneOf(["new", "edit", "locked"]).isRequired,
+  getMark: PropTypes.func.isRequired,
+  bufferPoisition: PropTypes.number,
   wrapperBorder: PropTypes.string,
   lasbelStyles: PropTypes.object
 };
