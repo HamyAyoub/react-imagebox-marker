@@ -8,6 +8,10 @@ const ImageMapper = ({
   lasbelStyles = {},
   imageSource,
   dataSource,
+  x_AxisAttribute,
+  y_AxisAttribute,
+  idAttribute,
+  labelAttribute,
   getMark,
   status
 }) => {
@@ -39,13 +43,14 @@ const ImageMapper = ({
       updatedList.pop();
     }
     const nextId =
-      (updatedList.length === 0 ? 0 : updatedList[updatedList.length - 1].id) +
-      1;
+      (updatedList.length === 0
+        ? 0
+        : +updatedList[updatedList.length - 1][idAttribute]) + 1;
     const newMark = {
-      id: nextId,
-      label: nextId,
-      x: x - bufferPoisition,
-      y: y - bufferPoisition
+      [idAttribute]: nextId,
+      [labelAttribute]: nextId,
+      [x_AxisAttribute]: x - bufferPoisition,
+      [y_AxisAttribute]: y - bufferPoisition
     };
     updatedList.push(newMark);
     setMarksList(updatedList);
@@ -86,7 +91,7 @@ const ImageMapper = ({
         />
         {marksList.map((data) => (
           <div
-            key={data.id}
+            key={data[idAttribute]}
             style={{
               position: "absolute",
               color: "#fff",
@@ -96,12 +101,12 @@ const ImageMapper = ({
               cursor: "default",
               ...lasbelStyles,
               userSelect: "none",
-              left: data.x,
-              top: data.y
+              left: data[x_AxisAttribute],
+              top: data[y_AxisAttribute]
             }}
             onClick={() => GetStableMark(data)}
           >
-            {data.label}
+            {data[labelAttribute]}
           </div>
         ))}
       </div>
@@ -110,13 +115,13 @@ const ImageMapper = ({
 };
 
 ImageMapper.propTypes = {
+  x_AxisAttribute: PropTypes.string.isRequired,
+  y_AxisAttribute: PropTypes.string.isRequired,
+  idAttribute: PropTypes.string.isRequired,
+  labelAttribute: PropTypes.string.isRequired,
   scrollable: PropTypes.bool.isRequired,
   imageSource: PropTypes.string.isRequired,
-  dataSource: PropTypes.arrayOf(function (id, label, styles) {
-    this.id = id; // number
-    this.label = label; // string
-    this.styles = styles; // css object
-  }).isRequired,
+  dataSource: PropTypes.array.isRequired,
   status: PropTypes.oneOf(["new", "edit", "locked"]).isRequired,
   getMark: PropTypes.func.isRequired,
   bufferPoisition: PropTypes.number,

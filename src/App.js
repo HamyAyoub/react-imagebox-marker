@@ -23,14 +23,7 @@ export default function App() {
 
   useEffect(
     () => {
-      const mapData = fakeData.map((d) => {
-        return {
-          id: d.number,
-          label: d.number,
-          x: d.x,
-          y: d.y
-        };
-      });
+      const mapData = fakeData.slice();
       setList(mapData);
     },
     [
@@ -45,7 +38,7 @@ export default function App() {
 
   const saveMark = (markObj) => {
     let listData = [...list];
-    const index = list.findIndex((d) => d.id === markObj.id);
+    const index = list.findIndex((d) => d.number === markObj.number);
     if (index < 0) {
       // send Post to Server EndMark
       // ...
@@ -62,11 +55,11 @@ export default function App() {
 
   const removeCb = (markObj) => {
     if (markStatus === "locked") return;
-    const obj = list.find((data) => markObj.id === data.id);
+    const obj = list.find((data) => markObj.number === data.number);
     if (obj) {
       // send Delete to Server EndMark
       // ...
-      const filteredData = list.filter((d) => d.id !== obj.id);
+      const filteredData = list.filter((d) => d.number !== obj.number);
       setList(filteredData);
     }
     setMark(null);
@@ -74,7 +67,7 @@ export default function App() {
 
   const cancelunSavedMark = (markObj) => {
     setMark(null);
-    const obj = list.find((data) => markObj.id === data.id);
+    const obj = list.find((data) => markObj.number === data.number);
     if (obj) return;
     setList([...list]);
     setMarkStatus("new");
@@ -83,7 +76,7 @@ export default function App() {
   const toggleLockImage = (markObj) => {
     if (markStatus === "locked") setMarkStatus("new");
     else {
-      if (!markObj || list.find((data) => markObj.id === data.id)) {
+      if (!markObj || list.find((data) => markObj.number === data.number)) {
         setMarkStatus("locked");
       }
     }
@@ -105,11 +98,15 @@ export default function App() {
       )}
       {markStatus !== "locked" &&
         mark &&
-        list.find((d) => d.id === mark.id) && (
-          <button onClick={() => removeCb(mark)}>rm {mark.id}</button>
+        list.find((d) => d.number === mark.number) && (
+          <button onClick={() => removeCb(mark)}>rm {mark.number}</button>
         )}
       <hr />
       <ImageMapper
+        x_AxisAttribute="x"
+        y_AxisAttribute="y"
+        idAttribute="number"
+        labelAttribute="number"
         status={markStatus}
         dataSource={list}
         getMark={getImageMark}
