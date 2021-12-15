@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 const ImageMapper = ({
-  bufferPoisition = 5,
-  scrollable = true,
-  wrapperBorder = "none",
-  lasbelStyles = {},
+  bufferPoisition,
+  scrollable,
+  wrapperBorder,
+  lasbelStyles,
   imageSource,
   dataSource,
   x_AxisAttribute,
@@ -127,6 +127,13 @@ ImageMapper.propTypes = {
   bufferPoisition: PropTypes.number,
   wrapperBorder: PropTypes.string,
   lasbelStyles: PropTypes.object
+};
+
+ImageMapper.defaultProps = {
+  bufferPoisition: 5,
+  scrollable: true,
+  wrapperBorder: "none",
+  lasbelStyles: {}
 };
 
 export default ImageMapper;
