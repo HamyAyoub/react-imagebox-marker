@@ -33,6 +33,7 @@ export default function App() {
 
   const getImageMark = (markObj, onlyGet = false) => {
     setMark(markObj);
+    if (markStatus === "reLocate") return;
     if (!onlyGet) setMarkStatus("edit");
   };
 
@@ -73,6 +74,20 @@ export default function App() {
     setMarkStatus("new");
   };
 
+  const reLocate = (markObj) => {
+    setMarkStatus("reLocate");
+    // let listData = [...list];
+    // const index = list.findIndex((d) => d.number === markObj.number);
+    // if (index >= 0) {
+    //   // send Put to Server EndMark
+    //   // ...
+    //   listData[index] = markObj;
+    // }
+    // setList(listData);
+    // setMarkStatus("new");
+    // setMark(null);
+  };
+
   const toggleLockImage = (markObj) => {
     if (markStatus === "locked") setMarkStatus("new");
     else {
@@ -85,7 +100,7 @@ export default function App() {
   return (
     <>
       <button onClick={() => toggleLockImage(mark)}>
-        {markStatus === "locked" ? "Unlock" : "lock"}
+        {markStatus === "locked" ? "Unlock" : "Lock"}
       </button>
       &nbsp;
       {mark && (
@@ -99,10 +114,21 @@ export default function App() {
       {markStatus !== "locked" &&
         mark &&
         list.find((d) => d.number === mark.number) && (
-          <button onClick={() => removeCb(mark)}>rm {mark.number}</button>
+          <>
+            {markStatus !== "reLocate" && (
+              <>
+                <button onClick={() => reLocate(mark)}>ReMark</button>
+                &nbsp;
+              </>
+            )}
+            <button onClick={() => removeCb(mark)}>
+              Remove ({mark.number})
+            </button>
+          </>
         )}
       <hr />
       <ImageMapper
+        relocatingMark={markStatus === "reLocate" ? mark : undefined}
         x_AxisAttribute="x"
         y_AxisAttribute="y"
         idAttribute="number"

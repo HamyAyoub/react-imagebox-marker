@@ -13,6 +13,7 @@ const ImageMapper = ({
   idAttribute,
   labelAttribute,
   getMark,
+  relocatingMark,
   status
 }) => {
   const [marksList, setMarksList] = useState([]);
@@ -43,15 +44,23 @@ const ImageMapper = ({
       updatedList.pop();
     }
     const nextId =
-      (updatedList.length === 0
-        ? 0
-        : +updatedList[updatedList.length - 1][idAttribute]) + 1;
+      status === "reLocate"
+        ? relocatingMark[idAttribute]
+        : (updatedList.length === 0
+            ? 0
+            : +updatedList[updatedList.length - 1][idAttribute]) + 1;
     const newMark = {
       [idAttribute]: nextId,
       [labelAttribute]: nextId,
       [x_AxisAttribute]: x - bufferPoisition,
       [y_AxisAttribute]: y - bufferPoisition
     };
+    if (status === "reLocate") {
+      var index = updatedList.findIndex(
+        (item) => item[idAttribute] === relocatingMark[idAttribute]
+      );
+      if (index !== -1) updatedList.splice(index, 1);
+    }
     updatedList.push(newMark);
     setMarksList(updatedList);
     getMark(newMark);
@@ -122,11 +131,12 @@ ImageMapper.propTypes = {
   scrollable: PropTypes.bool.isRequired,
   imageSource: PropTypes.string.isRequired,
   dataSource: PropTypes.array.isRequired,
-  status: PropTypes.oneOf(["new", "edit", "locked"]).isRequired,
+  status: PropTypes.oneOf(["new", "edit", "locked", "reLocate"]).isRequired,
   getMark: PropTypes.func.isRequired,
   bufferPoisition: PropTypes.number,
   wrapperBorder: PropTypes.string,
-  lasbelStyles: PropTypes.object
+  lasbelStyles: PropTypes.object,
+  relocatingMark: PropTypes.object
 };
 
 ImageMapper.defaultProps = {
