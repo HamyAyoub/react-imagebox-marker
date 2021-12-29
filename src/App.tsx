@@ -18,7 +18,7 @@ const fakeData = [
 
 const App: React.FC = () => {
   const [mark, setMark] = useState<MarkInterface | null>(null);
-  const [list, setList] = useState<any[]>([]);
+  const [list, setList] = useState<MarkInterface[]>([]);
   const [markStatus, setMarkStatus] = useState<StatusType>("new");
 
   useEffect(
