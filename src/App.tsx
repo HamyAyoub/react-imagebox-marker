@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import ImageMapper from "./ImageMapper";
+import React, { useState, useEffect } from "react";
+import ImageMapper, { MarkInterface, StatusType } from "./ImageMapper";
 
 const fakeData = [
   {
@@ -16,10 +16,10 @@ const fakeData = [
   }
 ];
 
-export default function App() {
-  const [mark, setMark] = useState(null);
-  const [list, setList] = useState([]);
-  const [markStatus, setMarkStatus] = useState("new");
+const App: React.FC = () => {
+  const [mark, setMark] = useState<MarkInterface | null>(null);
+  const [list, setList] = useState<any[]>([]);
+  const [markStatus, setMarkStatus] = useState<StatusType>("new");
 
   useEffect(
     () => {
@@ -31,13 +31,13 @@ export default function App() {
     ]
   ); // better to listen to your Server Data
 
-  const getImageMark = (markObj, onlyGet = false) => {
+  const getImageMark = (markObj: MarkInterface, onlyGet: boolean = false) => {
     setMark(markObj);
     if (markStatus === "reLocate") return;
     if (!onlyGet) setMarkStatus("edit");
   };
 
-  const saveMark = (markObj) => {
+  const saveMark = (markObj: MarkInterface) => {
     let listData = [...list];
     const index = list.findIndex((d) => d.number === markObj.number);
     if (index < 0) {
@@ -54,7 +54,7 @@ export default function App() {
     setMark(null);
   };
 
-  const removeCb = (markObj) => {
+  const removeCb = (markObj: MarkInterface) => {
     if (markStatus === "locked") return;
     const obj = list.find((data) => markObj.number === data.number);
     if (obj) {
@@ -66,7 +66,7 @@ export default function App() {
     setMark(null);
   };
 
-  const cancelunSavedMark = (markObj) => {
+  const cancelunSavedMark = (markObj: MarkInterface) => {
     setMark(null);
     const obj = list.find((data) => markObj.number === data.number);
     if (obj) return;
@@ -74,21 +74,11 @@ export default function App() {
     setMarkStatus("new");
   };
 
-  const reLocate = (markObj) => {
+  const reLocate = () => {
     setMarkStatus("reLocate");
-    // let listData = [...list];
-    // const index = list.findIndex((d) => d.number === markObj.number);
-    // if (index >= 0) {
-    //   // send Put to Server EndMark
-    //   // ...
-    //   listData[index] = markObj;
-    // }
-    // setList(listData);
-    // setMarkStatus("new");
-    // setMark(null);
   };
 
-  const toggleLockImage = (markObj) => {
+  const toggleLockImage = (markObj: MarkInterface) => {
     if (markStatus === "locked") setMarkStatus("new");
     else {
       if (!markObj || list.find((data) => markObj.number === data.number)) {
@@ -117,7 +107,7 @@ export default function App() {
           <>
             {markStatus !== "reLocate" && (
               <>
-                <button onClick={() => reLocate(mark)}>ReMark</button>
+                <button onClick={() => reLocate()}>ReMark</button>
                 &nbsp;
               </>
             )}
@@ -154,4 +144,6 @@ export default function App() {
       />
     </>
   );
-}
+};
+
+export default App;

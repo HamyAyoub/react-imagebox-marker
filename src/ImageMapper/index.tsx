@@ -1,7 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useEffect, useRef, MouseEvent } from "react";
+import CSS from "csstype";
 
-const ImageMapper = ({
+export interface MarkInterface {
+  [key: string]: string | number;
+}
+
+export type StatusType = "new" | "edit" | "locked" | "reLocate";
+
+type CoordinatesType = {
+  height: number;
+  width: number;
+};
+
+type Props = {
+  x_AxisAttribute: string;
+  y_AxisAttribute: string;
+  idAttribute: string;
+  labelAttribute: string;
+  scrollable: boolean;
+  imageSource: string;
+  dataSource: MarkInterface[];
+  status: StatusType;
+  getMark: (markObj: MarkInterface, onlyGet?: boolean) => void;
+  bufferPoisition?: number;
+  wrapperBorder?: string;
+  lasbelStyles?: CSS.Properties;
+  relocatingMark?: MarkInterface;
+};
+
+const ImageMapper: React.FC<Props> = ({
   bufferPoisition,
   scrollable,
   wrapperBorder,
@@ -15,10 +42,12 @@ const ImageMapper = ({
   getMark,
   relocatingMark,
   status
-}) => {
-  const [marksList, setMarksList] = useState([]);
-  const [imgCoordinates, setImgCoordinates] = useState(null);
-  const imgElem = useRef(null);
+}: Props) => {
+  const [marksList, setMarksList] = useState<MarkInterface[]>([]);
+  const [imgCoordinates, setImgCoordinates] = useState<CoordinatesType | null>(
+    null
+  );
+  const imgElem = useRef<HTMLImageElement | null>(null);
 
   useEffect(() => {
     setMarksList(dataSource);
@@ -33,7 +62,7 @@ const ImageMapper = ({
     }
   };
 
-  const addMark = (e) => {
+  const addMark = (e: MouseEvent<HTMLImageElement>) => {
     if (status === "locked") return;
     const offset = imgElem.current.getBoundingClientRect();
     const x = e.pageX - offset.left - window.pageXOffset;
@@ -66,7 +95,7 @@ const ImageMapper = ({
     getMark(newMark);
   };
 
-  const GetStableMark = (data) => {
+  const GetStableMark = (data: MarkInterface) => {
     const isEquals = marksList.length === dataSource.length;
     if (isEquals) getMark(data, true);
   };
@@ -121,22 +150,6 @@ const ImageMapper = ({
       </div>
     </div>
   );
-};
-
-ImageMapper.propTypes = {
-  x_AxisAttribute: PropTypes.string.isRequired,
-  y_AxisAttribute: PropTypes.string.isRequired,
-  idAttribute: PropTypes.string.isRequired,
-  labelAttribute: PropTypes.string.isRequired,
-  scrollable: PropTypes.bool.isRequired,
-  imageSource: PropTypes.string.isRequired,
-  dataSource: PropTypes.array.isRequired,
-  status: PropTypes.oneOf(["new", "edit", "locked", "reLocate"]).isRequired,
-  getMark: PropTypes.func.isRequired,
-  bufferPoisition: PropTypes.number,
-  wrapperBorder: PropTypes.string,
-  lasbelStyles: PropTypes.object,
-  relocatingMark: PropTypes.object
 };
 
 ImageMapper.defaultProps = {
